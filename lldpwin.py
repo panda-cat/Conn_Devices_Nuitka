@@ -8,7 +8,7 @@ import ctypes
 import sys
 from scapy.all import *
 from scapy.contrib.lldp import LLDPDU
-from scapy.contrib.cdp import CDP
+from scapy.contrib.cdp import CDPMsg
 
 # 加载WinDivert驱动
 try:
@@ -63,11 +63,11 @@ def process_packet(pkt):
             except Exception as e:
                 print(f"解析错误: {str(e)}")
 
-    elif pkt.haslayer(CDP):
+    elif pkt.haslayer(CDPMsg):  # 更新检查CDP层的方法
         print("\n[CDP设备发现]")
         print(f"接口: {pkt.sniffed_on}")
 
-        for cdp in pkt[CDP].data:
+        for cdp in pkt[CDPMsg].data:
             try:
                 if cdp.type == 0x01:
                     print(f"设备名称: {cdp.value.decode('utf-8', errors='ignore')}")
