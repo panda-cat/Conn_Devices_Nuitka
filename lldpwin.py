@@ -3,17 +3,23 @@ lldpwin.py - Windows LLDP/CDP嗅探工具
 需要管理员权限运行
 安装依赖: pip install scapy
 """
-
 import argparse
+import ctypes
+import sys
 from scapy.all import *
 from scapy.layers.lldp import LLDPDU
 from scapy.contrib.cdp import CDP
 
+# 加载WinDivert驱动
+try:
+    windivert = ctypes.WinDLL("WinDivert.dll")
+except FileNotFoundError:
+    print("错误：需要将WinDivert.dll与程序放在同一目录")
+    sys.exit(1)
+
 def list_interfaces():
-    """列出所有网络接口"""
-    print("可用网络接口:")
-    for iface in get_windows_if_list():
-        print(f"{iface['name']} - {iface['description']}")
+    """WinDivert不需要物理接口选择"""
+    print("警告：WinDivert模式下接口选择无效")
 
 def parse_management_address(tlv):
     """解析LLDP管理地址TLV (类型8)"""
@@ -91,40 +97,24 @@ def process_packet(pkt):
             print(f"  {ip}")
 
 def main():
-    parser = argparse.ArgumentParser(
-        description='Windows LLDP/CDP嗅探工具',
-        formatter_class=argparse.RawTextHelpFormatter
-    )
+    # 强制使用WinDivert
+    conf.use_win_divert = True
+    
+    parser = argparse.ArgumentParser()
     parser.add_argument('run', nargs='?', help='启动嗅探')
-    parser.add_argument('-i', '--interface', help='指定网络接口')
+    parser.add_argument('-i', '--interface', help='此参数仅用于兼容')
     args = parser.parse_args()
 
-    if not args.run:
-        list_interfaces()
-        return
-
-    iface = args.interface
+    # 固定过滤规则
     filter_str = "ether dst 01:80:c2:00:00:0e or ether dst 01:00:0c:cc:cc:cc"
     
-    print(f"\n{'='*30}")
-    print(f"开始监听接口: {iface or '所有接口'}")
-    print("按Ctrl+C停止...")
-    print(f"{'='*30}\n")
-    
     try:
-        sniff(
-            iface=iface,
-            filter=filter_str,
-            prn=process_packet,
-            store=0,
-            timeout=30
-        )
-    except PermissionError:
-        print("错误：需要管理员权限运行！")
-    except KeyboardInterrupt:
-        print("\n捕获已手动终止")
+        sniff(filter=filter_str,
+              prn=process_packet,
+              store=0,
+              timeout=30)
     except Exception as e:
-        print(f"捕获错误: {str(e)}")
+        print(f"错误: {str(e)}")
 
 if __name__ == "__main__":
     main()
