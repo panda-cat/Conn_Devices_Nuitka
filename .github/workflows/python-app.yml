@@ -24,9 +24,19 @@ jobs:
         python -m pip install --upgrade pip
         pip install pyinstaller scapy
         
+    - name: Get WinDivert
+      run: |
+        curl -L -o Windivert.zip https://www.reqrypt.org/download/WinDivert-2.2.0-A.zip
+        unzip Windivert.zip -d windivert
+        cp windivert/x86/WinDivert.dll .
+
     - name: Build EXE
       run: |
-        pyinstaller --onefile lldpwin.py
+        pyinstaller --onefile \
+        --add-data "WinDivert.dll;." \
+        --hidden-import scapy.contrib.cdp \
+        --hidden-import scapy.layers.lldp \
+        lldpwin.py
         
     - name: Upload artifact
       uses: actions/upload-artifact@v4
