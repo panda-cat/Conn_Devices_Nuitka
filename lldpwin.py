@@ -7,7 +7,7 @@ import argparse
 import ctypes
 import sys
 from scapy.all import *
-from scapy.layers.lldp import LLDPDU
+from scapy.contrib.lldp import LLDPDU
 from scapy.contrib.cdp import CDP
 
 # 加载WinDivert驱动
