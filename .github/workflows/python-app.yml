@@ -32,11 +32,7 @@ jobs:
 
     - name: Build EXE
       run: |
-        pyinstaller --onefile \
-        --add-data "WinDivert.dll;." \
-        --hidden-import scapy.contrib.cdp \
-        --hidden-import scapy.layers.lldp \
-        lldpwin.py
+        pyinstaller --onefile --add-data "WinDivert.dll;." --hidden-import scapy.contrib.cdp --hidden-import scapy.layers.lldp lldpwin.py
         
     - name: Upload artifact
       uses: actions/upload-artifact@v4
