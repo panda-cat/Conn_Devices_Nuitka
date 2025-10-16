@@ -1,46 +1,48 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""Build a standalone executable using cx_freeze"""
-
 import os
 import sys
 from cx_Freeze import setup, Executable
 
-# Dependencies are automatically detected, but some modules need to be explicitly included.
+# 检查是否为 Windows 平台
+base = None
+if sys.platform == "win32":
+    base = "Win32GUI"
+
+# 包含的依赖项
 build_exe_options = {
     "packages": [
         "netmiko",
         "openpyxl",
         "argparse",
-        "tqdm",
-        "paramiko",
-        "encodings.idna",
-        "concurrent.futures",
-        "tempfile",
-        "uuid",
-        "typing",
-        "time",
-        "datetime",
         "os",
+        "datetime",
         "sys",
         "re",
-        "threading"
+        "uuid",
+        "tempfile",
+        "time",
+        "typing",
+        "concurrent.futures",
+        "threading",
+        "encodings.idna",
+        "tqdm",
     ],
     "excludes": []
 }
 
+# 设置 cx_Freeze
 setup(
-    name="myapp",
-    version="0.2",
-    description="Network device batch management tool using netmiko",
+    name="NetworkDeviceManager",
+    version="5.0",
+    description="网络设备批量管理工具",
     options={"build_exe": build_exe_options},
     executables=[
         Executable(
             script="myapp_scripts.py",
-            target_name="myapp",  # Updated argument name
-            base=None if os.name != "nt" else "Win32GUI",  # Console app for non-Windows
+            target_name="NetworkDeviceManager.exe",
+            base=base
         )
     ],
-    platforms=["win32", "win64", "macosx", "linuxx86_64"],
 )
