@@ -27,7 +27,7 @@ jobs:
 
     - name: Build myapp
       run: |
-        nuitka --standalone --onefile --windows-console-mode=disable --output-dir=dist myapp_scripts.py
+        python -m nuitka --standalone --onefile --windows-console-mode=disable --output-dir=dist myapp_scripts.py
         
     - name: Upload artifact
       uses: actions/upload-artifact@v4
