@@ -1,0 +1,12 @@
+name: NetworkDeviceManager
+version: 1.0.0
+entry_point: myapp_scripts.py
+output_dir: ./dist
+target: windows
+icon: null  # 可选图标文件路径，设置为 .ico 文件
+includes:
+  - netmiko
+  - openpyxl
+  - tqdm
+  - concurrent.futures
+  - encodings.idna
