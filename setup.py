@@ -3,8 +3,8 @@
 
 """Build a standalone executable using cx_freeze"""
 
-import os  # Add this missing import
-import sys  # This is used and should also be included
+import os
+import sys
 from cx_Freeze import setup, Executable
 
 # Dependencies are automatically detected, but some modules need to be explicitly included.
@@ -38,7 +38,7 @@ setup(
     executables=[
         Executable(
             script="myapp_scripts.py",
-            targetName="myapp",  # Output executable name
+            target_name="myapp",  # Updated argument name
             base=None if os.name != "nt" else "Win32GUI",  # Console app for non-Windows
         )
     ],
