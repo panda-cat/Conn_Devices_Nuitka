@@ -22,15 +22,15 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install netmiko openpyxl tqdm paramiko==3.5.0 argparse cx_Freeze
+        pip install netmiko openpyxl tqdm paramiko==3.5.0 argparse nutika
         
 
     - name: Build myapp
       run: |
-        python setup.py build
+        nutika build
         
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
         name: pyappp
-        path: build/
+        path: dist/
