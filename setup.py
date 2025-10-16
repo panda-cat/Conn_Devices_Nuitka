@@ -5,11 +5,40 @@
 
 from cx_Freeze import setup, Executable
 
+# Dependencies are automatically detected, but some modules need to be explicitly included.
+build_exe_options = {
+    "packages": [
+        "netmiko",
+        "openpyxl",
+        "argparse",
+        "tqdm",
+        "paramiko",
+        "encodings.idna",
+        "concurrent.futures",
+        "tempfile",
+        "uuid",
+        "typing",
+        "time",
+        "datetime",
+        "os",
+        "sys",
+        "re",
+        "threading"
+    ],
+    "excludes": []
+}
+
 setup(
-    name = "myapp",
-    version = "0.1",
-    description = "Connect to network devices and execute commands using netmiko",
-    executables = [Executable("myapp_scripts.py")],
+    name="myapp",
+    version="0.2",
+    description="Network device batch management tool using netmiko",
+    options={"build_exe": build_exe_options},
+    executables=[
+        Executable(
+            script="myapp_scripts.py",
+            targetName="myapp",  # Output executable name
+            base=None if os.name != "nt" else "Win32GUI",  # Console app for non-Windows
+        )
+    ],
     platforms=["win32", "win64", "macosx", "linuxx86_64"],
-    packages=['netmiko', 'openpyxl', 'argparse', 'os', 'datetime', 'sys', 're', 'uuid', 'tqdm', 'paramiko==3.5.0'],
 )
