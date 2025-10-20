@@ -5,6 +5,7 @@ import netmiko
 import openpyxl
 import argparse
 import os
+import platform
 import datetime
 import sys
 import re
@@ -757,6 +758,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument('--debug', action='store_true', help='启用调试日志')
     parser.add_argument('-s', '--sheet', default='Sheet1', help='Excel工作表名称')
     parser.add_argument('--list-devices', action='store_true', help='列出所有支持的设备类型')
+
+    if '--version' in sys.argv or '-V' in sys.argv:
+        print("Python %s - %s",
+                      platform.python_version(), platform.platform())
+        print(netmiko.__version__)
     
     if '--help' in sys.argv or '-h' in sys.argv:
         print(f"""
