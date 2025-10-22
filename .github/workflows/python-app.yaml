@@ -5,73 +5,9 @@ name: Build & Compile (Windows)
 on: [push]
 
 jobs:
-  compile-pyc:
-    name: Compile to CPython bytecode (.pyc)
-    runs-on: windows-latest
-    timeout-minutes: 20
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Python 3.10
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-          architecture: 'x64'
-
-      - name: Cache pip
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
-      - name: Install runtime deps (for running/compiling)
-        shell: pwsh
-        run: |
-          python -m pip install --upgrade pip
-          if (Test-Path requirements.txt) {
-            pip install -r requirements.txt
-          } else {
-            pip install netmiko openpyxl tqdm paramiko==3.5.0
-          }
-
-      - name: Compile repository .py -> .pyc
-        shell: pwsh
-        run: |
-          Write-Host "Compiling repository .py files to .pyc using python -m compileall ..."
-          python -m compileall -f -q .
-          $pycs = Get-ChildItem -Path . -Recurse -Include *.pyc -File -ErrorAction SilentlyContinue
-          if ($pycs) {
-            Write-Host ("Compiled .pyc count: {0}" -f ($pycs.Count))
-          } else {
-            Write-Host "No .pyc files found."
-          }
-
-      - name: Package compiled bytecode (.pyc)
-        shell: pwsh
-        run: |
-          $pycs = Get-ChildItem -Path . -Recurse -Include *.pyc -File -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
-          if ($pycs) {
-            $artifact = "compiled_pyc.zip"
-            Compress-Archive -Path $pycs -DestinationPath $artifact -Force
-            Write-Host "Created $artifact"
-          } else {
-            Write-Host "No .pyc files to package"
-          }
-
-      - name: Upload compiled artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: compiled-pyc
-          path: compiled_pyc.zip
-
   nuitka-build:
     name: Build single-file EXE with Nuitka
     runs-on: windows-latest
-    needs: compile-pyc
     timeout-minutes: 40
 
     steps:
