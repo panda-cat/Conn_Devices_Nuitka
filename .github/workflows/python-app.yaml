@@ -1,6 +1,5 @@
-```yaml
 # Combined workflow: CPython bytecode compile (.pyc) + Nuitka onefile build (Windows)
-# Triggers on push; you can also add workflow_dispatch if you want manual runs with inputs.
+# Triggers on push (you can add workflow_dispatch for manual runs).
 name: Build & Compile (Windows)
 
 on: [push]
@@ -93,30 +92,32 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
 
-      - name: Install build deps
+      - name: Install build deps (Nuitka + runtime deps)
         shell: pwsh
         run: |
-          python -m pip install --upgrade pip
-          # Use requirements.txt if present; otherwise install minimal set required for Nuitka build & runtime
+          python -m pip install --upgrade pip wheel setuptools
+          # Install runtime deps and Nuitka. If you have requirements.txt prefer using that.
           if (Test-Path requirements.txt) {
             pip install -r requirements.txt
-            # Ensure Nuitka present if not listed
             pip install nuitka
           } else {
             pip install nuitka netmiko openpyxl tqdm paramiko==3.5.0
           }
+          # Show versions for debugging
+          python -V
+          pip show nuitka || python -m nuitka --version
 
-      - name: Build myapp with Nuitka (onefile)
-        # Use the official Nuitka GitHub Action to simplify building on Windows
-        uses: Nuitka/Nuitka-Action@main
-        with:
-          nuitka-version: main
-          script-name: myapp_scripts.py
-          mode: onefile
-          output-dir: dist
-          # You can add additional options here like:
-          # extra-args: "--enable-plugin=tk-inter" or "--standalone"
-          # If your script imports data files you may need to pass plugin/include-data-files options.
+      - name: Build myapp_scripts.py with Nuitka (onefile)
+        shell: pwsh
+        run: |
+          # Adjust the command below to add extra options you need.
+          # Common useful flags:
+          #   --onefile        => produce single-file EXE
+          #   --standalone     => standalone dir (useful for debugging)
+          #   --output-dir=dist
+          #   --enable-plugin=...  => enable plugins for data files, tkinter, qt, etc.
+          #   --include-data-files=src;dest
+          python -m nuitka --onefile --remove-output --output-dir=dist myapp_scripts.py
 
       - name: List dist contents
         shell: pwsh
