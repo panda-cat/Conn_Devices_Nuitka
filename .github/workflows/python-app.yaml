@@ -4,8 +4,6 @@
 name: Build & Compile (Windows)
 
 on: [push]
-  
-  workflow_dispatch:
 
 jobs:
   compile-pyc:
