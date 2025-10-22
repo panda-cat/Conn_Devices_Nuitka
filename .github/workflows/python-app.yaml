@@ -3,10 +3,8 @@
 # Triggers on push; you can also add workflow_dispatch if you want manual runs with inputs.
 name: Build & Compile (Windows)
 
-on:
-  push:
-    branches:
-      - '**'
+on: [push]
+  
   workflow_dispatch:
 
 jobs:
